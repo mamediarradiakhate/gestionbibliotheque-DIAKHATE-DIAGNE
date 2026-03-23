@@ -54,6 +54,25 @@ app.get('/users', (req, res) => {
   res.send("User Service is running");
 });
 
+app.get('/init-admin', async (req, res) => {
+  try {
+    const adminEmail = 'admin@bibliotheque.com';
+    const checkAdmin = await pool.query('SELECT * FROM users WHERE email=$1', [adminEmail]);
+    
+    if (checkAdmin.rows.length === 0) {
+      const passwordHash = await bcrypt.hash('admin123', 10);
+      await pool.query(
+        'INSERT INTO users(name, email, password) VALUES($1, $2, $3)',
+        ['Admin Library', adminEmail, passwordHash]
+      );
+      return res.json({ message: "Compte admin créé avec succès !" });
+    }
+    res.json({ message: "Le compte admin existe déjà." });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const BOOK_SERVICE_URL = process.env.BOOK_SERVICE_URL || "http://book-service:2600/api/books";
 
 const fetchBooksHandler = async (req, res) => {
@@ -101,18 +120,22 @@ app.post('/users/register', registerHandler);
 
 const loginHandler = async (req, res) => {
   const { email, password } = req.body;
+  console.log("Tentative de connexion pour:", email);
 
   try {
     const result = await pool.query('SELECT * FROM users WHERE email=$1', [email]);
+    console.log("Utilisateur trouvé:", result.rows.length > 0);
 
     if (result.rows.length === 0) {
-      return res.status(401).json("Invalid credentials");
+      return res.status(401).json("Identifiants invalides");
     }
 
     const user = result.rows[0];
     const passwordOk = await bcrypt.compare(password, user.password);
+    console.log("Mot de passe correct:", passwordOk);
+
     if (!passwordOk) {
-      return res.status(401).json("Invalid credentials");
+      return res.status(401).json("Identifiants invalides");
     }
 
     const jwtSecret = process.env.JWT_SECRET || "change-me";
