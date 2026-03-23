@@ -10,7 +10,7 @@ spec:
   rules:
   - http:
       paths:
-      - path: /books/?(.*)
+      - path: /api/books/?(.*)
         pathType: ImplementationSpecific
         backend:
           service:
@@ -30,10 +30,27 @@ spec:
   rules:
   - http:
       paths:
-      - path: /users/?(.*)
+      - path: /api/users/?(.*)
         pathType: ImplementationSpecific
         backend:
           service:
             name: user-service
             port:
               number: 2700
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: library-ingress-frontend
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
