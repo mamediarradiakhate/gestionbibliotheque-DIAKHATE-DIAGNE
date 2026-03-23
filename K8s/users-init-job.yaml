@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: users-table-init
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: psql-init
+          image: postgres:15
+          env:
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: library-secrets
+                  key: POSTGRES_USER
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: library-secrets
+                  key: POSTGRES_PASSWORD
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: library-secrets
+                  key: POSTGRES_DB
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              psql -h postgres-service -U "$PGUSER" -d "$PGDATABASE" -c "CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL);"
+              psql -h postgres-service -U "$PGUSER" -d "$PGDATABASE" -c "CREATE TABLE IF NOT EXISTS books (id SERIAL PRIMARY KEY, title TEXT NOT NULL, author TEXT NOT NULL, year INTEGER);"
+
+
+
