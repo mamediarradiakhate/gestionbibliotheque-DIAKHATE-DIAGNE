@@ -8,12 +8,12 @@ export default defineConfig({
     port: 3255,
     proxy: {
       '/api/users': {
-        target: 'http://localhost:2700',
+        target: 'http://192.168.49.2:30008',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/users/, '')
       },
       '/api/books': {
-        target: 'http://localhost:2600',
+        target: 'http://192.168.49.2:30007',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/books/, '/api/books')
       }
