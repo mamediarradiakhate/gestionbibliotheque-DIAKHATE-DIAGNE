@@ -26,6 +26,26 @@ async function initDb() {
 
 initDb();
 
+async function seedAdmin() {
+  try {
+    const adminEmail = 'admin@bibliotheque.com';
+    const checkAdmin = await pool.query('SELECT * FROM users WHERE email=$1', [adminEmail]);
+    
+    if (checkAdmin.rows.length === 0) {
+      const passwordHash = await bcrypt.hash('admin123', 10);
+      await pool.query(
+        'INSERT INTO users(name, email, password) VALUES($1, $2, $3)',
+        ['Admin Library', adminEmail, passwordHash]
+      );
+      console.log("Admin account seeded successfully");
+    }
+  } catch (err) {
+    console.error("Failed to seed admin:", err.message);
+  }
+}
+
+seedAdmin();
+
 app.get('/', (req, res) => {
   res.send("User Service is running");
 });
