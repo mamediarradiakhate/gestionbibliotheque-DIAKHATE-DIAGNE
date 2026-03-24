@@ -1,6 +1,6 @@
 # Système de Gestion de Bibliothèque (BiblioTech)
 
-Ce projet a été réalisé en binôme par :
+Projet réalisé en binôme par :
 - **DIAKHATE Mame Diarra Bousso**
 - **DIAGNE Maguette Madiodio**
 
