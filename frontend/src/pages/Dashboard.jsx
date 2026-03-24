@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Book as BookIcon, Loader2, Search, Plus, Filter, ArrowUpDown, MoreVertical, BookOpen, Clock, CheckCircle2 } from 'lucide-react';
+import { Book as BookIcon, Loader2, Search, Plus, Filter, MoreVertical, BookOpen, Clock, CheckCircle2, X, Trash2, Calendar, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { bookApi } from '../api';
 
@@ -9,6 +9,11 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('title');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // New book form state
+  const [newBook, setNewBook] = useState({ title: '', author: '', year: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchBooks();
@@ -24,6 +29,32 @@ const Dashboard = () => {
       setError("Impossible de charger les livres. Vérifiez que les services sont lancés.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddBook = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await bookApi.addBook(newBook);
+      setIsModalOpen(false);
+      setNewBook({ title: '', author: '', year: '' });
+      fetchBooks();
+    } catch (err) {
+      alert("Erreur lors de l'ajout du livre");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteBook = async (id) => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer ce livre ?")) {
+      try {
+        await bookApi.deleteBook(id);
+        fetchBooks();
+      } catch (err) {
+        alert("Erreur lors de la suppression");
+      }
     }
   };
 
@@ -55,6 +86,7 @@ const Dashboard = () => {
         <motion.button 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-500/20"
         >
           <Plus size={20} />
@@ -66,8 +98,8 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { label: 'Total Livres', value: books.length, icon: BookIcon, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-          { label: 'Disponibles', value: books.filter(b => b.available !== false).length, icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-400/10' },
-          { label: 'Empruntés', value: books.filter(b => b.available === false).length, icon: Clock, color: 'text-amber-400', bg: 'bg-amber-400/10' },
+          { label: 'Disponibles', value: books.length, icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-400/10' }, // Assuming all are available for now as no borrow logic yet
+          { label: 'Genres', value: 'Divers', icon: Clock, color: 'text-amber-400', bg: 'bg-amber-400/10' },
         ].map((stat, i) => (
           <div key={i} className="bg-gray-800/40 border border-gray-700/50 p-4 rounded-xl flex items-center gap-4">
             <div className={`${stat.bg} p-3 rounded-lg`}>
@@ -129,7 +161,7 @@ const Dashboard = () => {
           </div>
           <div className="space-y-2">
             <p className="text-2xl font-bold text-white">{error}</p>
-            <p className="text-red-400/80 max-w-md mx-auto">Assurez-vous que les services backend (ports 2600 et 2700) sont actifs.</p>
+            <p className="text-red-400/80 max-w-md mx-auto">Assurez-vous que les services backend sont actifs.</p>
           </div>
           <button 
             onClick={fetchBooks}
@@ -154,7 +186,6 @@ const Dashboard = () => {
                 className="group bg-gray-800/40 border border-gray-700/50 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 flex flex-col"
               >
                 <div className="h-44 bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center relative overflow-hidden">
-                  {/* Decorative background pattern */}
                   <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
                     <div className="absolute top-0 left-0 w-20 h-20 border-t-2 border-l-2 border-blue-500 rounded-tl-3xl"></div>
                     <div className="absolute bottom-0 right-0 w-20 h-20 border-b-2 border-r-2 border-indigo-500 rounded-br-3xl"></div>
@@ -163,8 +194,11 @@ const Dashboard = () => {
                   <BookIcon size={56} className="text-gray-700 group-hover:text-blue-400 transition-all duration-500 group-hover:scale-110" />
                   
                   <div className="absolute top-4 right-4">
-                    <button className="p-2 bg-gray-900/80 rounded-lg text-gray-400 hover:text-white transition-colors">
-                      <MoreVertical size={18} />
+                    <button 
+                      onClick={() => handleDeleteBook(book.id || book._id)}
+                      className="p-2 bg-red-500/20 rounded-lg text-red-400 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                    >
+                      <Trash2 size={18} />
                     </button>
                   </div>
                 </div>
@@ -177,10 +211,8 @@ const Dashboard = () => {
 
                   <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-700/50">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${book.available !== false ? 'bg-green-500' : 'bg-amber-500'}`}></span>
-                      <span className={`text-xs font-bold uppercase tracking-wider ${book.available !== false ? 'text-green-400' : 'text-amber-400'}`}>
-                        {book.available !== false ? 'Disponible' : 'Emprunté'}
-                      </span>
+                      <Calendar size={14} className="text-gray-500" />
+                      <span className="text-xs text-gray-500">{book.year || "N/A"}</span>
                     </div>
                     <span className="text-gray-600 text-xs font-mono">#{String(book.id || book._id).slice(-4)}</span>
                   </div>
@@ -191,19 +223,90 @@ const Dashboard = () => {
         </AnimatePresence>
       )}
 
-      {!loading && !error && filteredBooks.length === 0 && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="bg-gray-800/20 border-2 border-dashed border-gray-700/50 p-24 rounded-3xl text-center space-y-4"
-        >
-          <div className="bg-gray-800/50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Search size={40} className="text-gray-600" />
+      {/* Add Book Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsModalOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-gray-900 border border-gray-800 w-full max-w-md rounded-3xl p-8 relative z-10 shadow-2xl"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-white">Ajouter un livre</h2>
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <form onSubmit={handleAddBook} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-400 ml-1">Titre</label>
+                  <div className="relative group">
+                    <BookIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors" size={20} />
+                    <input
+                      type="text"
+                      required
+                      value={newBook.title}
+                      onChange={(e) => setNewBook({...newBook, title: e.target.value})}
+                      className="w-full bg-gray-800/50 border border-gray-700 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                      placeholder="Ex: Clean Code"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-400 ml-1">Auteur</label>
+                  <div className="relative group">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors" size={20} />
+                    <input
+                      type="text"
+                      required
+                      value={newBook.author}
+                      onChange={(e) => setNewBook({...newBook, author: e.target.value})}
+                      className="w-full bg-gray-800/50 border border-gray-700 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                      placeholder="Ex: Robert C. Martin"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-400 ml-1">Année</label>
+                  <div className="relative group">
+                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors" size={20} />
+                    <input
+                      type="number"
+                      value={newBook.year}
+                      onChange={(e) => setNewBook({...newBook, year: e.target.value})}
+                      className="w-full bg-gray-800/50 border border-gray-700 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                      placeholder="Ex: 2008"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
+                >
+                  {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : "Enregistrer le livre"}
+                </button>
+              </form>
+            </motion.div>
           </div>
-          <p className="text-xl font-semibold text-gray-400">Aucun résultat trouvé</p>
-          <p className="text-gray-500">Essayez de modifier vos termes de recherche ou vos filtres.</p>
-        </motion.div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 };

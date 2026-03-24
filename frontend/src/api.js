@@ -22,6 +22,8 @@ export const authApi = {
 
 export const bookApi = {
   getBooks: () => api.get('/books'),
+  addBook: (bookData) => api.post('/books', bookData),
+  deleteBook: (id) => api.delete(`/books/${id}`),
 };
 
 export default api;
