@@ -53,10 +53,8 @@ kubectl apply -f K8s/
 ### 3. Configuration du Réseau (Tunnel Minikube)
 Sous Windows avec le driver Docker, le réseau Kubernetes est isolé. Vous devez impérativement ouvrir des tunnels dans des terminaux séparés pour rendre les services accessibles :
 ```bash
-# Terminal 1 : Tunnel pour le service utilisateur
 minikube service user-service --url
 
-# Terminal 2 : Tunnel pour le service de livres
 minikube service book-service --url
 ```
 *Important : Si les ports générés (ex: 127.0.0.1:XXXXX) diffèrent de ceux configurés, veuillez mettre à jour le fichier `frontend/vite.config.js`.*

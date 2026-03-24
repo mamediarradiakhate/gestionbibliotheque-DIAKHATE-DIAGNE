@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Book as BookIcon, Loader2, Search, Plus, Filter, MoreVertical, BookOpen, Clock, CheckCircle2, X, Trash2, Calendar, User } from 'lucide-react';
+import { Book as BookIcon, Loader2, Search, Plus, Filter, BookOpen, Clock, CheckCircle2, X, Trash2, Calendar, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { bookApi } from '../api';
 
@@ -11,7 +11,6 @@ const Dashboard = () => {
   const [sortBy, setSortBy] = useState('title');
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  // New book form state
   const [newBook, setNewBook] = useState({ title: '', author: '', year: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -71,7 +70,6 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gray-800/50 p-6 rounded-2xl border border-gray-700/50 backdrop-blur-sm">
         <div>
           <h1 className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
@@ -79,7 +77,7 @@ const Dashboard = () => {
           </h1>
           <p className="text-gray-400 mt-2 flex items-center gap-2">
             <BookOpen size={16} />
-            Explorez et gérez votre collection d'ouvrages
+            Explorez et gérez votre collection d&apos;ouvrages
           </p>
         </div>
         
@@ -94,11 +92,10 @@ const Dashboard = () => {
         </motion.button>
       </div>
 
-      {/* Stats Quick View */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { label: 'Total Livres', value: books.length, icon: BookIcon, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-          { label: 'Disponibles', value: books.length, icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-400/10' }, // Assuming all are available for now as no borrow logic yet
+          { label: 'Disponibles', value: books.length, icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-400/10' },
           { label: 'Genres', value: 'Divers', icon: Clock, color: 'text-amber-400', bg: 'bg-amber-400/10' },
         ].map((stat, i) => (
           <div key={i} className="bg-gray-800/40 border border-gray-700/50 p-4 rounded-xl flex items-center gap-4">
@@ -113,7 +110,6 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-grow group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors" size={20} />
@@ -141,7 +137,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Books Grid */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-32 space-y-4">
           <div className="relative">
@@ -223,7 +218,6 @@ const Dashboard = () => {
         </AnimatePresence>
       )}
 
-      {/* Add Book Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

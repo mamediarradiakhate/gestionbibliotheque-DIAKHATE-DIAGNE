@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { LogIn, Mail, Lock, ArrowRight, Library, ShieldCheck, Sparkles } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Library, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { authApi } from '../api';
 
@@ -30,7 +30,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 lg:p-8 bg-[#0f172a]">
-      {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full"></div>
         <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full"></div>
@@ -42,7 +41,6 @@ const Login = () => {
         transition={{ duration: 0.5 }}
         className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 bg-gray-900/50 backdrop-blur-2xl rounded-[2.5rem] border border-gray-700/50 shadow-2xl overflow-hidden relative z-10"
       >
-        {/* Left Side: Image & Content */}
         <div className="hidden lg:block relative overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-900 p-12 text-white">
           <div className="absolute inset-0 opacity-20">
             <img 
@@ -90,12 +88,11 @@ const Login = () => {
 
             <div className="text-sm text-blue-200/50 flex items-center gap-2">
               <Sparkles size={16} />
-              <span>Propulsé par une IA intelligente</span>
+              <span>Propulsé par une architecture cloud-native</span>
             </div>
           </div>
         </div>
 
-        {/* Right Side: Login Form */}
         <div className="p-8 lg:p-12 flex flex-col justify-center space-y-8">
           <div className="space-y-2 text-center lg:text-left">
             <div className="lg:hidden bg-blue-600/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -175,7 +172,6 @@ const Login = () => {
             </p>
           </div>
 
-          {/* Test Account Helper */}
           <div className="bg-blue-500/5 border border-blue-500/10 rounded-[1.5rem] p-5 flex items-start gap-4">
             <div className="bg-blue-500/10 p-2 rounded-lg">
               <ShieldCheck className="text-blue-400 shrink-0" size={20} />

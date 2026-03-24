@@ -8,14 +8,12 @@ import Navbar from './components/Navbar';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
 
-  // Écouter les changements dans le localStorage pour mettre à jour l'état d'authentification
   useEffect(() => {
     const handleStorageChange = () => {
       setIsAuthenticated(!!localStorage.getItem('token'));
     };
 
     window.addEventListener('storage', handleStorageChange);
-    // On peut aussi créer un événement personnalisé si besoin pour le logout immédiat
     window.addEventListener('auth-change', handleStorageChange);
 
     return () => {
