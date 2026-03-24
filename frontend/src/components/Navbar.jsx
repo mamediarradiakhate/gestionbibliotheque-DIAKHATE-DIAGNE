@@ -8,6 +8,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    // Déclencher l'événement personnalisé pour mettre à jour l'état dans App.jsx
     window.dispatchEvent(new Event('auth-change'));
     navigate('/login');
   };

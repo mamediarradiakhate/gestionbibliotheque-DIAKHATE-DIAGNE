@@ -17,6 +17,7 @@ body {
   color: white;
 }
 
+/* Custom Scrollbar for better UX */
 ::-webkit-scrollbar {
   width: 8px;
 }

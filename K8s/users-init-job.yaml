@@ -32,6 +32,6 @@ spec:
               set -e
               psql -h postgres-service -U "$PGUSER" -d "$PGDATABASE" -c "CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL);"
               psql -h postgres-service -U "$PGUSER" -d "$PGDATABASE" -c "CREATE TABLE IF NOT EXISTS books (id SERIAL PRIMARY KEY, title TEXT NOT NULL, author TEXT NOT NULL, year INTEGER);"
+              # Insert admin user (password is 'admin123' hashed with bcrypt)
               psql -h postgres-service -U "$PGUSER" -d "$PGDATABASE" -c "INSERT INTO users (name, email, password) SELECT 'Admin Library', 'admin@bibliotheque.com', '\$2b\$10\$3b/XC.LHJb2rL1kwznhTCOtDd0wAWc67UUbvuq6RE8HUcgPhFkD8S' WHERE NOT EXISTS (SELECT 1 FROM users WHERE email='admin@bibliotheque.com');"
-
 
