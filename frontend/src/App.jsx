@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -6,7 +6,23 @@ import Dashboard from './pages/Dashboard';
 import Navbar from './components/Navbar';
 
 function App() {
-  const isAuthenticated = !!localStorage.getItem('token');
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+
+  // Écouter les changements dans le localStorage pour mettre à jour l'état d'authentification
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsAuthenticated(!!localStorage.getItem('token'));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    // On peut aussi créer un événement personnalisé si besoin pour le logout immédiat
+    window.addEventListener('auth-change', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('auth-change', handleStorageChange);
+    };
+  }, []);
 
   return (
     <Router>

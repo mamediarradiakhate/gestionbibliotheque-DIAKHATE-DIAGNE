@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, Book, User } from 'lucide-react';
+import { LogOut, Book } from 'lucide-react';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -8,6 +8,8 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    // Déclencher l'événement personnalisé pour mettre à jour l'état dans App.jsx
+    window.dispatchEvent(new Event('auth-change'));
     navigate('/login');
   };
 
